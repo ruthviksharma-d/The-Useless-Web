@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Useless Universe — Take Me Somewhere Weird</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07070f;--surface:#0f0f1a;--surface2:#161625;--surface3:#1d1d30;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#eeeeff;--muted:rgba(200,200,255,0.45);--muted2:rgba(200,200,255,0.25);
+  --pink:#ff2d78;--purple:#a855f7;--cyan:#06d6ff;--yellow:#ffd60a;
+  --green:#39ff14;--orange:#ff6b35;
+  --glow-pink:rgba(255,45,120,0.4);--glow-purple:rgba(168,85,247,0.35);
+  --glow-cyan:rgba(6,214,255,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  overflow-x:hidden;min-height:100vh;
+  cursor:default;
+}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--pink),var(--purple));border-radius:2px}
+
+/* ===== CANVAS ===== */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
+
+/* ===== NAV ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;height:60px;
+  background:rgba(7,7,15,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:900;
+  background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-.02em;
+}
+.nav-links{display:flex;gap:.25rem}
+.nav-btn{
+  background:none;border:none;color:var(--muted);
+  font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;
+  padding:.5rem .75rem;cursor:pointer;border-radius:4px;
+  transition:all .15s;
+}
+.nav-btn:hover,.nav-btn.active{color:var(--text);background:rgba(255,255,255,.06)}
+.nav-stats{display:flex;gap:1.5rem;align-items:center}
+.nav-stat{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-align:right}
+.nav-stat span{display:block;color:var(--pink);font-weight:700;font-size:.8rem}
+
+/* ===== MAIN ===== */
+main{position:relative;z-index:1;padding-top:60px}
+
+/* ===== HERO ===== */
+#hero{
+  min-height:calc(100vh - 60px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:4rem 2rem;text-align:center;position:relative;
+}
+.hero-eyebrow{
+  font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.25em;
+  color:var(--cyan);margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:.75rem;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{
+  content:'';display:block;height:1px;width:40px;
+  background:linear-gradient(to right,transparent,var(--cyan));
+}
+.hero-eyebrow::after{transform:scaleX(-1)}
+.hero-title{
+  font-family:'Unbounded',sans-serif;
+  font-size:clamp(2.8rem,8vw,7rem);
+  font-weight:900;line-height:.95;letter-spacing:-.04em;
+  margin-bottom:1rem;
+}
+.hero-title .line1{
+  background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,.7) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  display:block;
+}
+.hero-title .line2{
+  background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  display:block;
+}
+.hero-tagline{
+  font-size:1.05rem;color:var(--muted);margin-bottom:3rem;
+  max-width:520px;font-weight:300;letter-spacing:.01em;
+}
+.hero-tagline em{color:var(--text);font-style:normal}
+
+/* ===== CTA BUTTON ===== */
+.cta-wrap{display:flex;flex-direction:column;align-items:center;gap:1rem;margin-bottom:4rem}
+#cta-btn{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  border:none;cursor:pointer;
+  font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;padding:1.25rem 3rem;border-radius:4px;
+  transition:all .2s;
+  box-shadow:0 0 40px var(--glow-pink),0 0 80px var(--glow-purple);
+  animation:pulse-cta 3s ease-in-out infinite;
+}
+#cta-btn:hover{transform:scale(1.04);box-shadow:0 0 60px var(--glow-pink),0 0 120px var(--glow-purple)}
+#cta-btn:active{transform:scale(.98)}
+#cta-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+  transform:translateX(-100%);transition:transform .6s;
+}
+#cta-btn:hover::before{transform:translateX(100%)}
+.cta-hint{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted2);letter-spacing:.1em;text-transform:uppercase}
+.cta-modes{display:flex;gap:.5rem;margin-top:.5rem}
+.mode-btn{
+  background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  color:var(--muted);font-family:'Space Mono',monospace;font-size:.6rem;
+  text-transform:uppercase;letter-spacing:.1em;padding:.4rem .8rem;
+  border-radius:3px;cursor:pointer;transition:all .15s;
+}
+.mode-btn:hover,.mode-btn.active{border-color:var(--pink);color:var(--pink);background:rgba(255,45,120,.08)}
+
+/* ===== COUNTERS STRIP ===== */
+.counters-strip{
+  display:flex;gap:3rem;align-items:center;justify-content:center;
+  padding:2rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  margin-bottom:4rem;
+}
+.counter-item{text-align:center}
+.counter-num{
+  font-family:'Unbounded',sans-serif;font-size:2.2rem;font-weight:900;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.counter-label{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;margin-top:.25rem}
+
+/* ===== SECTION TITLES ===== */
+.section-hd{
+  display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;
+}
+.section-hd h2{
+  font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.2em;color:var(--muted);
+}
+.section-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+.section-dot{width:6px;height:6px;border-radius:50%;background:var(--pink);flex-shrink:0}
+
+/* ===== CARDS GRID ===== */
+section{padding:0 2rem 4rem;max-width:1400px;margin:0 auto}
+
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1px;background:var(--border);border:1px solid var(--border);
+}
+.site-card{
+  background:var(--surface);padding:1.25rem;
+  transition:all .2s;cursor:pointer;position:relative;
+  display:flex;flex-direction:column;gap:.75rem;
+}
+.site-card:hover{background:var(--surface2);z-index:2}
+.site-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--glow-pink),transparent);
+  opacity:0;transition:opacity .2s;pointer-events:none;
+}
+.site-card:hover::after{opacity:.08}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem}
+.card-emoji{font-size:1.8rem;line-height:1;flex-shrink:0}
+.card-badges{display:flex;flex-direction:column;gap:.3rem;align-items:flex-end}
+.badge{
+  font-family:'Space Mono',monospace;font-size:.55rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;
+  padding:2px 7px;border-radius:2px;
+  border:1px solid currentColor;
+  opacity:.8;
+}
+.badge-legendary{color:var(--yellow);background:rgba(255,214,10,.08)}
+.badge-cat{color:var(--cyan);background:rgba(6,214,255,.06)}
+.card-name{
+  font-family:'Unbounded',sans-serif;font-size:.9rem;font-weight:700;
+  letter-spacing:-.02em;line-height:1.2;
+}
+.card-desc{font-size:.82rem;color:var(--muted);line-height:1.5;font-weight:300}
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:auto;padding-top:.75rem;border-top:1px solid var(--border);
+}
+.weirdness-wrap{display:flex;flex-direction:column;gap:4px;flex:1}
+.weirdness-label{
+  font-family:'Space Mono',monospace;font-size:.55rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.08em;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.weirdness-bar-bg{height:2px;background:rgba(255,255,255,.08);border-radius:0;overflow:hidden}
+.weirdness-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink));
+  border-radius:0;
+}
+.card-go{
+  background:none;border:1px solid var(--border2);color:var(--muted);
+  font-family:'Space Mono',monospace;font-size:.55rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:.35rem .7rem;border-radius:2px;cursor:pointer;
+  transition:all .15s;margin-left:1rem;flex-shrink:0;
+}
+.card-go:hover{border-color:var(--pink);color:var(--pink);background:rgba(255,45,120,.08)}
+.weird-score-badge{
+  font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;
+}
+
+/* ===== FEATURED ===== */
+.featured-card{
+  background:var(--surface);border:1px solid var(--border2);
+  padding:2rem;display:flex;gap:2rem;align-items:center;
+  border-radius:2px;position:relative;overflow:hidden;
+  cursor:pointer;transition:all .2s;
+}
+.featured-card:hover{background:var(--surface2);border-color:rgba(255,45,120,.3)}
+.featured-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,45,120,.06),transparent,rgba(168,85,247,.04));
+  pointer-events:none;
+}
+.featured-emoji{font-size:4rem;flex-shrink:0}
+.featured-content{flex:1}
+.featured-label{
+  font-family:'Space Mono',monospace;font-size:.6rem;color:var(--yellow);
+  text-transform:uppercase;letter-spacing:.2em;margin-bottom:.5rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.featured-label::before{content:'★';font-size:.5rem}
+.featured-name{
+  font-family:'Unbounded',sans-serif;font-size:1.5rem;font-weight:900;
+  letter-spacing:-.03em;margin-bottom:.5rem;
+}
+.featured-desc{color:var(--muted);font-size:.9rem;line-height:1.6;font-weight:300;margin-bottom:1rem}
+.featured-action{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-family:'Space Mono',monospace;font-size:.65rem;
+  font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  padding:.6rem 1.25rem;border-radius:2px;border:none;cursor:pointer;
+  transition:all .15s;
+}
+.featured-action:hover{opacity:.9;transform:translateX(2px)}
+.featured-badge{
+  position:absolute;top:1rem;right:1rem;
+  font-family:'Space Mono',monospace;font-size:.55rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;
+  padding:3px 10px;background:rgba(255,214,10,.1);color:var(--yellow);
+  border:1px solid rgba(255,214,10,.3);border-radius:2px;
+}
+
+/* ===== MARQUEE ===== */
+.marquee-wrap{
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:.75rem 0;overflow:hidden;margin-bottom:4rem;
+  background:var(--surface);
+}
+.marquee-inner{
+  display:flex;gap:2rem;width:max-content;
+  animation:marquee 40s linear infinite;
+}
+.marquee-inner:hover{animation-play-state:paused}
+.marquee-item{
+  font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  display:flex;align-items:center;gap:.5rem;white-space:nowrap;
+}
+.marquee-dot{width:4px;height:4px;border-radius:50%;background:var(--pink);flex-shrink:0}
+
+/* ===== CATEGORIES ===== */
+.cats-grid{display:flex;flex-wrap:wrap;gap:.5rem}
+.cat-btn{
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--muted);font-family:'Space Mono',monospace;
+  font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  padding:.5rem 1rem;border-radius:2px;cursor:pointer;
+  transition:all .15s;
+}
+.cat-btn:hover{border-color:var(--pink);color:var(--pink);background:rgba(255,45,120,.06)}
+.cat-btn.active{border-color:var(--pink);color:var(--pink);background:rgba(255,45,120,.12)}
+
+/* ===== RABBIT HOLE ===== */
+.rabbit-hole-track{
+  display:flex;align-items:center;gap:0;overflow-x:auto;
+  padding:.5rem 0;scrollbar-width:thin;
+}
+.rh-card{
+  flex-shrink:0;width:180px;background:var(--surface);
+  border:1px solid var(--border);padding:1rem;
+  position:relative;cursor:pointer;transition:all .15s;
+}
+.rh-card:hover{background:var(--surface2);border-color:var(--pink)}
+.rh-card.active{border-color:var(--cyan)}
+.rh-arrow{
+  flex-shrink:0;padding:0 .5rem;color:var(--muted);
+  font-size:1.2rem;font-family:'Space Mono',monospace;
+}
+.rh-emoji{font-size:1.5rem;margin-bottom:.4rem;display:block}
+.rh-name{font-family:'Unbounded',sans-serif;font-size:.7rem;font-weight:700;margin-bottom:.3rem}
+.rh-desc{font-size:.65rem;color:var(--muted);line-height:1.4}
+.rh-depth{
+  position:absolute;top:.4rem;right:.4rem;
+  font-family:'Space Mono',monospace;font-size:.5rem;color:var(--cyan);
+}
+
+/* ===== ACHIEVEMENTS ===== */
+.achievements-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1px;background:var(--border);border:1px solid var(--border)}
+.achievement{
+  background:var(--surface);padding:1rem;
+  display:flex;align-items:center;gap:.75rem;
+  transition:all .15s;
+}
+.achievement.unlocked{background:var(--surface2)}
+.achievement-icon{font-size:1.5rem;opacity:.4;transition:opacity .3s}
+.achievement.unlocked .achievement-icon{opacity:1}
+.achievement-info{flex:1}
+.achievement-name{font-family:'Unbounded',sans-serif;font-size:.7rem;font-weight:700;margin-bottom:.2rem}
+.achievement-desc{font-size:.65rem;color:var(--muted);line-height:1.4}
+.achievement-lock{font-family:'Space Mono',monospace;font-size:.5rem;color:var(--muted2);margin-top:.25rem;text-transform:uppercase;letter-spacing:.08em}
+.achievement.unlocked .achievement-lock{color:var(--green)}
+
+/* ===== SPIN WHEEL ===== */
+.spin-wrap{display:flex;flex-direction:column;align-items:center;gap:1.5rem;padding:2rem}
+#spin-canvas{border-radius:50%;box-shadow:0 0 60px var(--glow-purple)}
+.spin-btn{
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  border:none;color:#fff;
+  font-family:'Unbounded',sans-serif;font-size:.85rem;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;
+  padding:.9rem 2.5rem;border-radius:3px;cursor:pointer;
+  transition:all .15s;
+}
+.spin-btn:hover{transform:scale(1.04);opacity:.95}
+.spin-btn:disabled{opacity:.4;cursor:default;transform:none}
+
+/* ===== FILTER/SEARCH ===== */
+.filter-row{display:flex;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center}
+.search-wrap{
+  flex:1;min-width:200px;position:relative;
+}
+.search-input{
+  width:100%;background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:.9rem;
+  padding:.65rem 1rem .65rem 2.5rem;border-radius:3px;outline:none;
+  transition:border-color .15s;
+}
+.search-input:focus{border-color:var(--purple)}
+.search-input::placeholder{color:var(--muted2)}
+.search-icon{
+  position:absolute;left:.75rem;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:1rem;pointer-events:none;
+}
+.sort-select{
+  background:var(--surface2);border:1px solid var(--border2);color:var(--text);
+  font-family:'Space Mono',monospace;font-size:.65rem;
+  padding:.65rem 1rem;border-radius:3px;outline:none;cursor:pointer;
+  text-transform:uppercase;letter-spacing:.06em;
+}
+
+/* ===== TELEPORT OVERLAY ===== */
+#teleport{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  flex-direction:column;align-items:center;justify-content:center;gap:2rem;
+}
+#teleport.show{display:flex}
+.teleport-title{
+  font-family:'Unbounded',sans-serif;font-size:2rem;font-weight:900;
+  background:linear-gradient(135deg,var(--cyan),var(--purple),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  text-align:center;letter-spacing:-.03em;
+}
+.teleport-sub{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.2em}
+.t-bar-bg{width:300px;height:2px;background:var(--surface3);overflow:hidden}
+.t-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink));
+  width:0%;animation:t-fill 1.8s ease forwards;
+}
+@keyframes t-fill{to{width:100%}}
+.t-glyphs{
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted2);
+  text-align:center;max-width:300px;word-break:break-all;
+  animation:glitch-text 1.8s linear;
+}
+@keyframes glitch-text{
+  0%,100%{opacity:1}
+  50%{opacity:.3;transform:translateX(2px)}
+}
+.t-result{
+  display:none;flex-direction:column;align-items:center;gap:1rem;
+  text-align:center;
+}
+.t-result.show{display:flex}
+.t-result-emoji{font-size:4rem;animation:bounce-in .5s cubic-bezier(.36,.07,.19,.97)}
+.t-result-name{
+  font-family:'Unbounded',sans-serif;font-size:1.5rem;font-weight:900;
+  letter-spacing:-.03em;
+}
+.t-result-desc{color:var(--muted);font-size:.9rem;max-width:400px;font-weight:300}
+.t-result-actions{display:flex;gap:.75rem;margin-top:.5rem}
+.t-open-btn{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  border:none;color:#fff;
+  font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;
+  padding:.65rem 1.5rem;border-radius:3px;cursor:pointer;transition:all .15s;
+}
+.t-open-btn:hover{opacity:.9}
+.t-skip-btn{
+  background:none;border:1px solid var(--border2);color:var(--muted);
+  font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;
+  padding:.65rem 1.5rem;border-radius:3px;cursor:pointer;transition:all .15s;
+}
+.t-skip-btn:hover{border-color:var(--text);color:var(--text)}
+.weird-tag{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:.3rem .8rem;border-radius:2px;border:1px solid currentColor;
+}
+
+/* ===== TOAST / ACHIEVEMENT POPUP ===== */
+#toast-container{position:fixed;bottom:2rem;right:2rem;z-index:9998;display:flex;flex-direction:column;gap:.5rem}
+.toast{
+  background:var(--surface2);border:1px solid var(--border2);
+  padding:1rem 1.25rem;border-radius:4px;
+  display:flex;align-items:center;gap:.75rem;
+  box-shadow:0 8px 32px rgba(0,0,0,.6);
+  animation:slide-up .4s ease;min-width:260px;
+}
+.toast-icon{font-size:1.5rem;flex-shrink:0}
+.toast-text{flex:1}
+.toast-title{font-family:'Unbounded',sans-serif;font-size:.75rem;font-weight:700;margin-bottom:.15rem}
+.toast-sub{font-size:.72rem;color:var(--muted);font-weight:300}
+.toast.achievement{border-color:rgba(255,214,10,.4);box-shadow:0 8px 32px rgba(255,214,10,.2)}
+
+/* ===== STATS ROW ===== */
+.stats-row{
+  display:flex;flex-wrap:wrap;gap:1px;
+  background:var(--border);border:1px solid var(--border);
+  margin-bottom:4rem;
+}
+.stat-box{
+  flex:1;min-width:140px;background:var(--surface);
+  padding:1.25rem;text-align:center;
+}
+.stat-num{
+  font-family:'Unbounded',sans-serif;font-size:1.8rem;font-weight:900;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:.25rem;
+}
+.stat-lbl{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+
+/* ===== FACT BAR ===== */
+.fact-bar{
+  background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:.85rem 2rem;display:flex;align-items:center;gap:1rem;
+  margin-bottom:4rem;
+}
+.fact-label{
+  font-family:'Space Mono',monospace;font-size:.58rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.15em;color:var(--pink);
+  flex-shrink:0;
+}
+.fact-text{font-size:.82rem;color:var(--muted);font-weight:300}
+
+/* ===== FOOTER ===== */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);padding:3rem 2rem;
+  text-align:center;
+}
+.footer-logo{
+  font-family:'Unbounded',sans-serif;font-size:1.2rem;font-weight:900;
+  background:linear-gradient(135deg,var(--pink),var(--purple),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:.5rem;
+}
+.footer-sub{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted2);text-transform:uppercase;letter-spacing:.15em}
+
+/* ===== ANIMATIONS ===== */
+@keyframes pulse-cta{
+  0%,100%{box-shadow:0 0 40px var(--glow-pink),0 0 80px var(--glow-purple)}
+  50%{box-shadow:0 0 70px var(--glow-pink),0 0 140px var(--glow-purple),0 0 200px rgba(6,214,255,.15)}
+}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes slide-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce-in{0%{opacity:0;transform:scale(.5)}60%{transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:640px){
+  .nav-stats{display:none}
+  .nav-links{gap:0}
+  .nav-btn{padding:.4rem .5rem;font-size:.55rem}
+  .counters-strip{gap:1.5rem;flex-wrap:wrap}
+  .featured-card{flex-direction:column;align-items:flex-start}
+  .cards-grid{grid-template-columns:1fr}
+  section{padding:0 1rem 3rem}
+  nav{padding:0 1rem}
+  #hero{padding:3rem 1rem}
+  .hero-title{font-size:clamp(2.2rem,10vw,4rem)}
+}
+
+/* ===== TABS ===== */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.tab{
+  background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;
+  padding:.75rem 1.25rem;cursor:pointer;transition:all .15s;margin-bottom:-1px;
+}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text);border-bottom-color:var(--pink)}
+
+/* ===== PAGE SECTIONS ===== */
+.page{display:none}
+.page.active{display:block}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="toast-container"></div>
+
+<!-- TELEPORT OVERLAY -->
+<div id="teleport">
+  <div id="t-loading">
+    <div class="teleport-title" id="t-title">Teleporting Through The Internet...</div>
+    <div class="teleport-sub" id="t-sub">Calculating maximum weirdness</div>
+    <div class="t-bar-bg"><div class="t-bar-fill" id="t-bar"></div></div>
+    <div class="t-glyphs" id="t-glyphs">01001000 01100101 01101100 01101100 01101111</div>
+  </div>
+  <div class="t-result" id="t-result">
+    <div class="t-result-emoji" id="t-emoji"></div>
+    <div class="t-result-name" id="t-name"></div>
+    <div id="t-weird-badge"></div>
+    <div class="t-result-desc" id="t-desc"></div>
+    <div class="t-result-actions">
+      <button class="t-open-btn" id="t-open">Enter The Void →</button>
+      <button class="t-skip-btn" id="t-skip">Skip</button>
+      <button class="t-skip-btn" id="t-close">✕ Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Useless Universe</div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('home')">Home</button>
+    <button class="nav-btn" onclick="showPage('explore')">Explore</button>
+    <button class="nav-btn" onclick="showPage('rabbit')">Rabbit Hole</button>
+    <button class="nav-btn" onclick="showPage('achievements')">Badges</button>
+    <button class="nav-btn" onclick="showPage('wheel')">Spin</button>
+  </div>
+  <div class="nav-stats">
+    <div class="nav-stat"><span id="nav-discoveries">0</span>Discoveries</div>
+    <div class="nav-stat"><span id="nav-streak">0</span>Day Streak</div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ===== HOME PAGE ===== -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-eyebrow">Curated Internet Chaos</div>
+    <h1 class="hero-title">
+      <span class="line1">Take Me</span>
+      <span class="line2">Somewhere Weird</span>
+    </h1>
+    <p class="hero-tagline" id="hero-tagline">Loading tagline...</p>
+
+    <div class="cta-wrap">
+      <button id="cta-btn" onclick="launchRandom()">⚡ Take Me Somewhere Weird</button>
+      <div class="cta-hint">or choose a mode</div>
+      <div class="cta-modes">
+        <button class="mode-btn active" id="mode-random" onclick="setMode('random')">Random</button>
+        <button class="mode-btn" id="mode-chaos" onclick="setMode('chaos')">Chaos</button>
+        <button class="mode-btn" id="mode-legendary" onclick="setMode('legendary')">Legendary</button>
+        <button class="mode-btn" id="mode-category" onclick="setMode('category')">Category</button>
+      </div>
+    </div>
+
+    <!-- COUNTERS -->
+    <div class="counters-strip">
+      <div class="counter-item"><div class="counter-num">105</div><div class="counter-label">Weird Sites</div></div>
+      <div class="counter-item"><div class="counter-num" id="cnt-discoveries">0</div><div class="counter-label">Discovered</div></div>
+      <div class="counter-item"><div class="counter-num">12</div><div class="counter-label">Legendary</div></div>
+      <div class="counter-item"><div class="counter-num" id="cnt-favorites">0</div><div class="counter-label">Favorites</div></div>
+    </div>
+  </section>
+
+  <!-- FACT BAR -->
+  <div class="fact-bar" style="position:relative;z-index:1">
+    <div class="fact-label">🧠 Weird Fact</div>
+    <div class="fact-text" id="fact-text"></div>
+  </div>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-inner" id="marquee-inner"></div>
+  </div>
+
+  <!-- FEATURED -->
+  <section>
+    <div class="section-hd"><div class="section-dot"></div><h2>Daily Featured</h2></div>
+    <div class="featured-card" id="featured-card" onclick="openFeatured()">
+      <div class="featured-badge">✦ TODAY'S PICK</div>
+      <div class="featured-emoji" id="feat-emoji"></div>
+      <div class="featured-content">
+        <div class="featured-label">Daily Featured Website</div>
+        <div class="featured-name" id="feat-name"></div>
+        <div class="featured-desc" id="feat-desc"></div>
+        <button class="featured-action">Visit Now →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRENDING -->
+  <section>
+    <div class="section-hd"><div class="section-dot"></div><h2>Trending Weird</h2></div>
+    <div class="cards-grid" id="trending-grid"></div>
+  </section>
+
+  <!-- RECENTLY DISCOVERED -->
+  <section>
+    <div class="section-hd"><div class="section-dot"></div><h2>Recently Discovered</h2></div>
+    <div class="cards-grid" id="recent-grid"></div>
+  </section>
+
+  <!-- STATS -->
+  <section>
+    <div class="section-hd"><div class="section-dot"></div><h2>Universe Stats</h2></div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" id="stat-total">105</div><div class="stat-lbl">Total Sites</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-disc">0</div><div class="stat-lbl">Your Discoveries</div></div>
+      <div class="stat-box"><div class="stat-num">12</div><div class="stat-lbl">Legendary Sites</div></div>
+      <div class="stat-box"><div class="stat-num">13</div><div class="stat-lbl">Categories</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-fav">0</div><div class="stat-lbl">Your Favorites</div></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== EXPLORE PAGE ===== -->
+<div class="page" id="page-explore">
+  <section style="padding-top:2rem">
+    <div class="section-hd"><div class="section-dot"></div><h2>Explore All Sites</h2></div>
+    <div class="filter-row">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" id="search-input" placeholder="Search the weird web..." oninput="filterSites()">
+      </div>
+      <select class="sort-select" id="sort-select" onchange="filterSites()">
+        <option value="weirdness">Sort: Weirdness</option>
+        <option value="fun">Sort: Fun Score</option>
+        <option value="name">Sort: Name A-Z</option>
+      </select>
+    </div>
+    <div class="cats-grid" id="cats-grid" style="margin-bottom:1.5rem"></div>
+    <div class="cards-grid" id="explore-grid"></div>
+  </section>
+</div>
+
+<!-- ===== RABBIT HOLE PAGE ===== -->
+<div class="page" id="page-rabbit">
+  <section style="padding-top:2rem">
+    <div class="section-hd"><div class="section-dot"></div><h2>Rabbit Hole Mode</h2></div>
+    <p style="color:var(--muted);font-size:.9rem;font-weight:300;margin-bottom:1.5rem">
+      Follow the chain into increasingly strange corners of the internet. Each site leads somewhere weirder.
+    </p>
+    <div style="display:flex;gap:.75rem;margin-bottom:2rem">
+      <button class="featured-action" onclick="startRabbitHole()">🐇 Start New Rabbit Hole</button>
+      <button class="t-skip-btn" onclick="extendRabbitHole()" id="rh-extend-btn" style="display:none">Go Deeper →</button>
+    </div>
+    <div class="rabbit-hole-track" id="rh-track"></div>
+    <div id="rh-current" style="margin-top:2rem;display:none"></div>
+  </section>
+</div>
+
+<!-- ===== ACHIEVEMENTS PAGE ===== -->
+<div class="page" id="page-achievements">
+  <section style="padding-top:2rem">
+    <div class="section-hd"><div class="section-dot"></div><h2>Achievement Badges</h2></div>
+    <p style="color:var(--muted);font-size:.82rem;font-weight:300;margin-bottom:1.5rem">
+      Unlock badges by exploring the weird web. <span id="ach-count">0/12</span> unlocked.
+    </p>
+    <div class="achievements-grid" id="ach-grid"></div>
+  </section>
+</div>
+
+<!-- ===== SPIN WHEEL PAGE ===== -->
+<div class="page" id="page-wheel">
+  <section style="padding-top:2rem;text-align:center">
+    <div class="section-hd"><div class="section-dot"></div><h2>Spin the Wheel</h2></div>
+    <p style="color:var(--muted);font-size:.9rem;font-weight:300;margin-bottom:1.5rem;text-align:left">
+      Let fate decide your next destination. Spin to discover a random weird site.
+    </p>
+    <div class="spin-wrap">
+      <div style="position:relative;display:inline-block">
+        <canvas id="spin-canvas" width="320" height="320"></canvas>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--bg);border:2px solid var(--pink);display:flex;align-items:center;justify-content:center;font-size:.8rem">⚡</div>
+        </div>
+      </div>
+      <button class="spin-btn" id="spin-btn" onclick="spinWheel()">SPIN!</button>
+      <div id="spin-result" style="display:none;text-align:center">
+        <div id="spin-emoji" style="font-size:2.5rem;margin-bottom:.5rem"></div>
+        <div id="spin-name" style="font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:900;margin-bottom:.5rem"></div>
+        <div id="spin-desc" style="color:var(--muted);font-size:.82rem;margin-bottom:1rem"></div>
+        <button class="featured-action" id="spin-go">Visit It →</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+</main>
+
+<footer>
+  <div class="footer-logo">Useless Universe</div>
+  <div class="footer-sub" style="margin-top:.5rem">105 weird websites · infinite rabbit holes · zero productivity</div>
+  <div style="margin-top:1.5rem;font-family:'Space Mono',monospace;font-size:.55rem;color:var(--muted2)">
+    Made with maximum weirdness · Not responsible for lost productivity
+  </div>
+</footer>
+
+<script>
+// ===== DATA =====
+const SITES = [
+  {id:1,name:'Cat Bounce',url:'https://cat-bounce.com/',desc:'Cats. Bouncing. That is literally it. You need this.',cat:'Funny',w:60,fun:95,emoji:'🐱'},
+  {id:2,name:'Pointer Pointer',url:'https://pointerpointer.com/',desc:'Points at your cursor with a random photo of a person pointing. Every. Single. Time.',cat:'Interactive',w:85,fun:90,emoji:'👆'},
+  {id:3,name:'Endless Horse',url:'http://endless.horse/',desc:'A horse with infinitely long legs scrolling down forever. You will scroll.',cat:'Internet Classics',w:90,fun:88,emoji:'🐴'},
+  {id:4,name:'Eel Slap',url:'http://eelslap.com/',desc:'Slap someone with an eel using your mouse. Therapeutic.',cat:'Funny',w:88,fun:96,emoji:'🐍'},
+  {id:5,name:'Staggering Beauty',url:'http://www.staggeringbeauty.com/',desc:'Shake it. Just... shake it. Warning: flashy visuals.',cat:'Mind Blowing',w:95,fun:89,emoji:'🐛',legendary:true},
+  {id:6,name:'Falling Falling',url:'https://www.fallingfalling.com/',desc:'Fall through an endless tunnel of geometric shapes.',cat:'Visual Illusions',w:78,fun:80,emoji:'🌀'},
+  {id:7,name:'Checkbox Race',url:'https://checkbox.toys/scale/',desc:'Watch thousands of checkboxes get checked in a glorious cascade.',cat:'Interactive',w:72,fun:85,emoji:'☑️'},
+  {id:8,name:'One Square Minesweeper',url:'https://onesquareminesweeper.com/',desc:"The world's simplest minesweeper. One square. 50/50 odds.",cat:'Games',w:82,fun:92,emoji:'💣'},
+  {id:9,name:'Doughnut Kitten',url:'https://donutkitten.com/',desc:'A kitten inside a doughnut flying through space. Perfectly normal.',cat:'Funny',w:75,fun:93,emoji:'🍩'},
+  {id:10,name:'Pug in a Rug',url:'https://puginarug.com/',desc:'A pug wrapped snugly in a rug, staring at you.',cat:'Funny',w:65,fun:88,emoji:'🐶'},
+  {id:11,name:'Corn Dog',url:'https://corndog.io/',desc:'Pet the corn dog. You know you want to.',cat:'Funny',w:70,fun:90,emoji:'🌽'},
+  {id:12,name:'Tiny Tuba',url:'https://www.tinytuba.com/',desc:'A tiny tuba. Playing itself. Nothing more.',cat:'Music',w:80,fun:82,emoji:'🎺'},
+  {id:13,name:'Zombo',url:'https://zombo.com/',desc:'You can do anything at Zombo.com. ANYTHING.',cat:'Internet Classics',w:99,fun:94,emoji:'🧟',legendary:true},
+  {id:14,name:'Long Doge Challenge',url:'https://longdogechallenge.com/',desc:'How long is this doge? Scroll right. Keep scrolling.',cat:'Funny',w:85,fun:91,emoji:'🐕'},
+  {id:15,name:'RRRGGGBBB',url:'https://rrrgggbbb.com/',desc:'Mix RGB colors with your mouse in a mesmerizing way.',cat:'Art',w:70,fun:86,emoji:'🌈'},
+  {id:16,name:'Sliding Puzzle Daily',url:'https://sliding.toys/mystic-square/8-puzzle/daily/',desc:'Solve the daily 8-puzzle sliding tile challenge.',cat:'Games',w:45,fun:88,emoji:'🔲'},
+  {id:17,name:'Optical Toys',url:'https://optical.toys/',desc:'A collection of beautiful optical illusions that will break your brain.',cat:'Visual Illusions',w:82,fun:92,emoji:'👁️'},
+  {id:18,name:'Maze Daily',url:'https://maze.toys/mazes/mini/daily/',desc:'A fresh maze to solve every single day.',cat:'Games',w:40,fun:80,emoji:'🌀'},
+  {id:19,name:'Paint Zen Garden',url:'https://paint.toys/zen-garden/',desc:'Create beautiful zen garden patterns with your cursor.',cat:'Creative Tools',w:55,fun:89,emoji:'🪨'},
+  {id:20,name:'Memory Classic',url:'https://memory.toys/classic/easy/',desc:'Classic memory card matching game. Timeless.',cat:'Games',w:35,fun:78,emoji:'🃏'},
+  {id:21,name:'Cruel Maze',url:'https://cruel.toys/maze/',desc:"A maze that's just a little bit mean to you.",cat:'Games',w:65,fun:85,emoji:'😈'},
+  {id:22,name:'Mondrian & Me',url:'https://mondrianandme.com/',desc:'Generate Mondrian-style artwork. Feel artsy for 3 minutes.',cat:'Art',w:60,fun:83,emoji:'🎨'},
+  {id:23,name:'Cursor Effects',url:'https://cursoreffects.com/',desc:'A showcase of insane cursor effects.',cat:'Interactive',w:68,fun:88,emoji:'🖱️'},
+  {id:24,name:'Binary Piano',url:'https://binarypiano.com/',desc:'Play piano in binary. As you do.',cat:'Music',w:78,fun:82,emoji:'🎹'},
+  {id:25,name:"That's The Finger",url:'https://thatsthefinger.com/',desc:'A website that is exactly what it sounds like.',cat:'Funny',w:72,fun:89,emoji:'🖕'},
+  {id:26,name:'Patience',url:'https://patience.toys/',desc:'Just... be patient. Something will happen. Maybe.',cat:'Mind Blowing',w:88,fun:80,emoji:'⏳'},
+  {id:27,name:'Weird or Confusing',url:'https://weirdorconfusing.com/',desc:'Vote on whether things are weird or just confusing.',cat:'Random',w:75,fun:87,emoji:'🤔'},
+  {id:28,name:"Can't Not Tweet This",url:'https://cant-not-tweet-this.com/',desc:'Content so irresistible you cannot not tweet it.',cat:'Funny',w:70,fun:85,emoji:'🐦'},
+  {id:29,name:'Ant Farm',url:'https://ant.toys/',desc:'Watch virtual ants build their colony in real time.',cat:'Interactive',w:65,fun:90,emoji:'🐜'},
+  {id:30,name:'Peg Solitaire',url:'https://clicking.toys/peg-solitaire/english/',desc:'The classic peg solitaire board game. Deceptively hard.',cat:'Games',w:38,fun:82,emoji:'🔴'},
+  {id:31,name:'The Useless Web',url:'https://theuselessweb.com/',desc:'The OG useless website directory. A classic.',cat:'Internet Classics',w:65,fun:90,emoji:'🌐'},
+  {id:32,name:'Koalas to the Max',url:'https://www.koalastothemax.com/',desc:'Hover to reveal a secret image made of circles.',cat:'Interactive',w:72,fun:91,emoji:'🐨'},
+  {id:33,name:'Nyan Cat',url:'https://www.nyan.cat/',desc:'The OG pop tart cat flying through space with a rainbow trail.',cat:'Internet Classics',w:88,fun:95,emoji:'🌈',legendary:true},
+  {id:34,name:'Hacktyper',url:'https://hackertyper.net/',desc:'Type anything and look like a Hollywood hacker instantly.',cat:'Funny',w:68,fun:94,emoji:'💻'},
+  {id:35,name:'Virtual Bubble Wrap',url:'https://www.virtual-bubblewrap.com/',desc:'Pop virtual bubble wrap forever. Surprisingly satisfying.',cat:'Interactive',w:55,fun:92,emoji:'🫧'},
+  {id:36,name:'Most Dangerous Writing App',url:'https://www.themostdangerouswritingapp.com/',desc:'Stop typing and lose everything. Chaos writing.',cat:'Creative Tools',w:85,fun:88,emoji:'⚡'},
+  {id:37,name:'Fluid Simulation',url:'https://paveldogreat.github.io/WebGL-Fluid-Simulation/',desc:'Swirl fluid with your cursor. Absolutely mesmerizing.',cat:'Visual Illusions',w:70,fun:94,emoji:'💧'},
+  {id:38,name:'Paper Toilet',url:'https://papertoilet.com/',desc:'Roll the virtual toilet paper. Someone had to make this.',cat:'Random',w:82,fun:80,emoji:'🧻'},
+  {id:39,name:'Silk Art',url:'https://weavesilk.com/',desc:'Draw symmetric silk patterns in your browser.',cat:'Art',w:60,fun:90,emoji:'🕸️'},
+  {id:40,name:'Procatinator',url:'https://procatinator.com/',desc:'Cat GIFs synced to music. The productivity killer.',cat:'Funny',w:72,fun:93,emoji:'🎶'},
+  {id:41,name:'Incredibox',url:'https://www.incredibox.com/',desc:'Create beatbox music by dragging sounds onto characters.',cat:'Music',w:55,fun:96,emoji:'🎵'},
+  {id:42,name:'Find the Invisible Cow',url:'https://findtheinvisiblecow.com/',desc:'Find a cow using only audio cues. The louder the moo, the closer you are.',cat:'Games',w:82,fun:94,emoji:'🐄',legendary:true},
+  {id:43,name:'Quick Draw',url:'https://quickdraw.withgoogle.com/',desc:'Can AI guess what you are drawing in 20 seconds?',cat:'AI Experiments',w:62,fun:94,emoji:'🤖'},
+  {id:44,name:'This Person Does Not Exist',url:'https://thispersondoesnotexist.com/',desc:'AI-generated faces of people who have never existed.',cat:'AI Experiments',w:92,fun:88,emoji:'👤',legendary:true},
+  {id:45,name:'Radio Garden',url:'https://radio.garden/',desc:'Spin a globe and listen to live radio from anywhere on Earth.',cat:'Music',w:65,fun:93,emoji:'📻'},
+  {id:46,name:'Windows 93',url:'https://www.windows93.net/',desc:'An alternate universe Windows from 1993. Fully functional weirdness.',cat:'Nostalgia',w:88,fun:95,emoji:'🖥️',legendary:true},
+  {id:47,name:'Akinator',url:'https://en.akinator.com/',desc:'The web genie guesses any character you think of.',cat:'AI Experiments',w:78,fun:94,emoji:'🧞'},
+  {id:48,name:'Zoomquilt',url:'https://zoomquilt.org/',desc:'Infinitely zooming surreal art that never ends.',cat:'Art',w:88,fun:90,emoji:'🔭',legendary:true},
+  {id:49,name:'Nooooooooooooooo',url:'https://www.nooooooooooooooo.com/',desc:'Click for a dramatic no. Very useful in meetings.',cat:'Funny',w:78,fun:92,emoji:'😱'},
+  {id:50,name:'Do Nothing For 2 Min',url:'https://www.donothingfor2minutes.com/',desc:'Stare at ocean waves for 2 minutes without touching anything.',cat:'Mind Blowing',w:65,fun:78,emoji:'🌊'},
+  {id:51,name:'Scale of the Universe',url:'https://htwins.net/scale2/',desc:'Zoom from quarks to the observable universe. Existential crisis included.',cat:'Educational Oddities',w:72,fun:92,emoji:'🌍'},
+  {id:52,name:'This Is Sand',url:'https://thisissand.com/',desc:'Pour sand of different colors to make pixel art. Hours vanish.',cat:'Creative Tools',w:62,fun:91,emoji:'⏳'},
+  {id:53,name:'JS Paint',url:'https://jspaint.app/',desc:'MS Paint rebuilt perfectly in the browser.',cat:'Nostalgia',w:60,fun:90,emoji:'🖌️'},
+  {id:54,name:'Cannot Unsee',url:'https://cannotunsee.space/',desc:'Spot the design difference between two nearly identical UIs. Agonizing.',cat:'Educational Oddities',w:68,fun:90,emoji:'👁️'},
+  {id:55,name:'Is It Christmas',url:'https://isitchristmas.com/',desc:'Is it Christmas? Find out. Updated daily.',cat:'Random',w:70,fun:85,emoji:'🎄'},
+  {id:56,name:'A Soft Murmur',url:'https://asoftmurmur.com/',desc:'Mix ambient sounds: rain, thunder, coffee shop, waves.',cat:'Music',w:48,fun:88,emoji:'🔊'},
+  {id:57,name:'Make Everything OK',url:'http://make-everything-ok.com/',desc:'A button that makes everything OK. Or does it?',cat:'Random',w:75,fun:88,emoji:'✅'},
+  {id:58,name:'Human Benchmark',url:'https://humanbenchmark.com/',desc:'Test your reaction time, memory, and other human abilities.',cat:'Educational Oddities',w:52,fun:90,emoji:'🧪'},
+  {id:59,name:'The Wiki Game',url:'https://www.thewikigame.com/',desc:'Race from one Wikipedia page to another using only links.',cat:'Games',w:55,fun:92,emoji:'📖'},
+  {id:60,name:'Webamp',url:'https://webamp.org/',desc:'Winamp 2.9 running perfectly in your browser.',cat:'Nostalgia',w:72,fun:91,emoji:'🎵'},
+  {id:61,name:'Earth Wind Map',url:'https://earth.nullschool.net/',desc:'Real-time wind, weather, ocean, and pollution map of Earth.',cat:'Mind Blowing',w:68,fun:90,emoji:'🌊'},
+  {id:62,name:'Skribbl.io',url:'https://skribbl.io/',desc:'Multiplayer drawing and guessing game. Chaos with friends.',cat:'Games',w:52,fun:95,emoji:'🎨'},
+  {id:63,name:'Geoguessr',url:'https://geoguessr.com/',desc:'Guess where in the world you are from Street View.',cat:'Games',w:45,fun:97,emoji:'🗺️'},
+  {id:64,name:'The Quiet Place',url:'https://thequietplace.com/',desc:'A place to escape from the internet noise. Just breathe.',cat:'Mind Blowing',w:60,fun:72,emoji:'🧘'},
+  {id:65,name:'Bounce.js',url:'https://bouncejs.com/',desc:'Create bouncy CSS animation sequences.',cat:'Creative Tools',w:60,fun:85,emoji:'⚽'},
+  {id:66,name:'I Write Like',url:'https://iwl.me/',desc:'Paste text and find out which famous author you write like.',cat:'Educational Oddities',w:58,fun:84,emoji:'✍️'},
+  {id:67,name:'WorldWideWeb Desktop',url:'https://worldwideweb.cern.ch/',desc:'Browse the internet as it looked in 1991.',cat:'Nostalgia',w:75,fun:87,emoji:'🕸️'},
+  {id:68,name:'Draw a Stickman',url:'https://www.drawastickman.com/',desc:'Draw your hero, then watch them go on an adventure.',cat:'Creative Tools',w:65,fun:91,emoji:'✏️'},
+  {id:69,name:'Rainy Mood',url:'https://rainymood.com/',desc:'Just rain sounds. Sometimes that is all you need.',cat:'Music',w:30,fun:75,emoji:'🌧️'},
+  {id:70,name:'Agar.io',url:'https://agar.io/',desc:'Be a cell. Eat smaller cells. Avoid bigger cells.',cat:'Games',w:50,fun:94,emoji:'🦠'},
+  {id:71,name:'The Nicest Place',url:'https://thenicestplace.net/',desc:'Strangers from YouTube give you a virtual hug.',cat:'Random',w:62,fun:85,emoji:'🤗'},
+  {id:72,name:'NASA Eyes',url:'https://eyes.nasa.gov/',desc:'Real-time 3D visualization of NASA missions in space.',cat:'Mind Blowing',w:60,fun:91,emoji:'🚀'},
+  {id:73,name:'The Restart Page',url:'http://www.therestartpage.com/',desc:'Restart screens from every Windows/Mac version.',cat:'Nostalgia',w:70,fun:88,emoji:'🔄'},
+  {id:74,name:'Screaming Bee',url:'https://www.screamingbee.com/',desc:'A bee. Screaming. At you. Personally.',cat:'Funny',w:85,fun:88,emoji:'🐝'},
+  {id:75,name:'ASCII Aquarium',url:'https://asciiplease.com/',desc:'A fish tank rendered entirely in ASCII characters.',cat:'Art',w:75,fun:82,emoji:'🐠'},
+  {id:76,name:'The Oregon Trail',url:'https://archive.org/details/msdos_Oregon_Trail_The_1990/',desc:'Die of dysentery in the classic 1990 Oregon Trail.',cat:'Nostalgia',w:55,fun:90,emoji:'🏕️'},
+  {id:77,name:'Cannot Unsee UI',url:'https://cannotunsee.space/',desc:'Spot the tiny design differences. Your designer brain explodes.',cat:'Educational Oddities',w:68,fun:88,emoji:'🎯'},
+  {id:78,name:'BoredTV',url:'https://boredtv.com/',desc:'Random YouTube videos from across the internet.',cat:'Random',w:65,fun:88,emoji:'📺'},
+  {id:79,name:'Typegun',url:'https://typegun.com/',desc:'A typing game that shoots things. Therapeutic.',cat:'Games',w:62,fun:90,emoji:'🔫'},
+  {id:80,name:'Make Everything OK',url:'http://make-everything-ok.com/',desc:'The button that makes everything OK. Or claims to.',cat:'Random',w:75,fun:88,emoji:'✅'},
+  {id:81,name:'I Am Awesome',url:'https://www.iamawesome.com/',desc:'The internet confirming you are awesome. You needed this.',cat:'Random',w:55,fun:78,emoji:'✨'},
+  {id:82,name:'Superbetter',url:'https://www.superbetter.com/',desc:'Turn your real life into a video game.',cat:'Educational Oddities',w:58,fun:80,emoji:'🎮'},
+  {id:83,name:'A-Z Animals',url:'https://a-z-animals.com/',desc:'Every animal from A to Z with absurd facts.',cat:'Educational Oddities',w:45,fun:82,emoji:'🦒'},
+  {id:84,name:'Slither.io',url:'https://slither.io/',desc:'Snake but online and you can eat other players.',cat:'Games',w:45,fun:93,emoji:'🐍'},
+  {id:85,name:'Tetris Classic',url:'https://tetris.com/play-tetris',desc:'The infinite Tetris that has consumed billions of hours.',cat:'Games',w:25,fun:95,emoji:'🟦'},
+  {id:86,name:'Impossible Color',url:'https://impossiblecolor.com/',desc:"See colors your eyes aren't supposed to be able to see.",cat:'Visual Illusions',w:90,fun:88,emoji:'🟣',legendary:true},
+  {id:87,name:'Kitty Roulette',url:'https://kittyroulette.com/',desc:'Cute kittens, ranked. Who is the cutest of them all?',cat:'Funny',w:65,fun:88,emoji:'🐱'},
+  {id:88,name:'AutoDraw',url:'https://www.autodraw.com/',desc:'Google AI suggests what you are drawing.',cat:'AI Experiments',w:58,fun:88,emoji:'✏️'},
+  {id:89,name:'Pointer Madness',url:'https://codepen.io/towc/pen/mEbpmL',desc:'Your cursor becomes part of a physics simulation.',cat:'Interactive',w:72,fun:88,emoji:'🌪️'},
+  {id:90,name:'Strangers Q84',url:'https://89.248.160.142/',desc:'A mysterious live-streaming website from... somewhere.',cat:'Mind Blowing',w:95,fun:80,emoji:'🔮',legendary:true},
+  {id:91,name:'Emupedia',url:'https://emupedia.net/',desc:'Play classic DOS and Windows games in your browser.',cat:'Nostalgia',w:68,fun:92,emoji:'🕹️'},
+  {id:92,name:'Weave Silk',url:'https://weavesilk.com/',desc:'Create mesmerizing silk thread art. Symmetry mode is divine.',cat:'Art',w:58,fun:91,emoji:'🕸️'},
+  {id:93,name:'Falling Guy',url:'https://www.fallingguy.com/',desc:'Ragdoll physics with a little guy falling everywhere.',cat:'Interactive',w:75,fun:89,emoji:'🤸'},
+  {id:94,name:'BrowserQuest',url:'https://browserquest.mozilla.org/',desc:"Mozilla's HTML5 MMORPG. Adventure in your browser.",cat:'Games',w:55,fun:88,emoji:'⚔️'},
+  {id:95,name:'Internet Archive',url:'https://archive.org/',desc:'The whole internet archived. Time travel through websites.',cat:'Nostalgia',w:65,fun:88,emoji:'📚'},
+  {id:96,name:'Geo Daily Challenge',url:'https://geoguessr.com/daily-challenge',desc:'Guess world locations from Street View. One shot per day.',cat:'Games',w:42,fun:93,emoji:'📍'},
+  {id:97,name:'Best Joke In',url:'https://www.bestjokein.com/',desc:'Infinite bad jokes. Groan forever.',cat:'Funny',w:50,fun:80,emoji:'😂'},
+  {id:98,name:'Alwaysjudgeabookbyitscover',url:'https://alwaysjudgeabookbyitscover.com/',desc:"Judge books by their covers. Controversial but correct.",cat:'Random',w:68,fun:85,emoji:'📕'},
+  {id:99,name:'Ant Toys',url:'https://ant.toys/',desc:'Ant colony simulation. Mesmerizing and oddly satisfying.',cat:'Interactive',w:65,fun:88,emoji:'🐜'},
+  {id:100,name:'Mondrian Generator',url:'https://mondrianandme.com/',desc:'Make Mondrian art. Pretend you understand modernism.',cat:'Art',w:58,fun:83,emoji:'🟥'},
+  {id:101,name:'Patience Toys',url:'https://patience.toys/',desc:'A test of your patience. How long can you wait?',cat:'Mind Blowing',w:85,fun:78,emoji:'⌛'},
+  {id:102,name:'Checkbox Scale',url:'https://checkbox.toys/scale/',desc:'Scale of checkboxes that grows infinitely.',cat:'Interactive',w:70,fun:82,emoji:'✔️'},
+  {id:103,name:'Paint Toys',url:'https://paint.toys/zen-garden/',desc:'Zen garden painting in your browser.',cat:'Creative Tools',w:52,fun:87,emoji:'🌸'},
+  {id:104,name:'Clicking Toys',url:'https://clicking.toys/peg-solitaire/english/',desc:'Peg solitaire reimagined for the clicking generation.',cat:'Games',w:40,fun:80,emoji:'🟡'},
+  {id:105,name:'Memory Toys',url:'https://memory.toys/classic/easy/',desc:'Memory matching game with a modern twist.',cat:'Games',w:38,fun:76,emoji:'🧠'},
+];
+
+const TAGLINES=[
+  "Productivity's worst nightmare since 2024",
+  "Warning: Side effects include wasted time & uncontrollable giggling",
+  "Your boss is not watching. Click it.",
+  "Every website here has passed a rigorous uselessness test",
+  "100% scientifically proven to survive boring meetings",
+  "Not responsible for any existential crises",
+  "Where the weird corners of the internet retire",
+  "Life is short. These websites are even shorter.",
+  "Making the internet weird again, one click at a time",
+  "You came for something useful. You found us. Congrats.",
+];
+
+const FACTS=[
+  "The first website ever made is still online at info.cern.ch",
+  "There are over 1.9 billion websites. Most are completely useless.",
+  "About 90% of all websites get zero organic traffic.",
+  "The first YouTube video was uploaded on April 23, 2005.",
+  "The @ symbol was chosen for email in 1971 by Ray Tomlinson.",
+  "GIF was invented in 1987 and absolutely refuses to die.",
+  "The word 'meme' was coined by Richard Dawkins in 1976.",
+  "The first tweet ever was 'just setting up my twttr'.",
+  "Zombo.com has told you that you can do anything since 1999.",
+  "The first computer bug was an actual moth found in a relay in 1947.",
+];
+
+const ACHIEVEMENTS=[
+  {id:'first',icon:'🎯',name:'First Discovery',desc:'Visit your first weird website',req:1,type:'discover'},
+  {id:'ten',icon:'🔟',name:'10 Sites Explored',desc:'Visit 10 different websites',req:10,type:'discover'},
+  {id:'fifty',icon:'🌟',name:'50 Sites Explored',desc:'Visit 50 different websites',req:50,type:'discover'},
+  {id:'hundred',icon:'💯',name:'100 Sites Explored',desc:'Visit all 100+ websites',req:100,type:'discover'},
+  {id:'chaos',icon:'👽',name:'Chaos Explorer',desc:'Discover a site with weirdness > 90',req:1,type:'chaos'},
+  {id:'archaeo',icon:'⛏️',name:'Internet Archaeologist',desc:'Visit an Internet Classic site',req:1,type:'classic'},
+  {id:'rabbit',icon:'🐇',name:'Rabbit Hole Master',desc:'Complete a 5-site rabbit hole chain',req:5,type:'rabbit'},
+  {id:'hunter',icon:'🌌',name:'Weirdness Hunter',desc:'Discover 5 legendary sites',req:5,type:'legendary'},
+  {id:'streak',icon:'🔥',name:'On Fire',desc:'Discover 10 sites in one session',req:10,type:'session'},
+  {id:'music',icon:'🎵',name:'Audiophile of Chaos',desc:'Visit 3 music category sites',req:3,type:'cat_Music'},
+  {id:'games',icon:'🎮',name:'Game Over',desc:'Visit 5 games category sites',req:5,type:'cat_Games'},
+  {id:'ai',icon:'🤖',name:'AI Curious',desc:'Visit 3 AI Experiments sites',req:3,type:'cat_AI Experiments'},
+];
+
+// ===== STATE =====
+let state={
+  discoveries:JSON.parse(localStorage.getItem('uu_discoveries')||'[]'),
+  session_discoveries:0,
+  rabbit_chain:[],
+  mode:'random',
+  active_cat:null,
+  spinning:false,
+  spin_angle:0,
+};
+
+function save(){localStorage.setItem('uu_discoveries',JSON.stringify(state.discoveries))}
+
+// ===== INIT =====
+window.onload=()=>{
+  initCanvas();
+  renderTagline();
+  renderFact();
+  renderMarquee();
+  renderFeatured();
+  renderTrending();
+  renderRecent();
+  renderExplore();
+  renderCats();
+  renderAchievements();
+  initSpinWheel();
+  updateCounters();
+};
+
+// ===== NAV =====
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map={home:0,explore:1,rabbit:2,achievements:3,wheel:4};
+  const btns=document.querySelectorAll('.nav-btn');
+  if(btns[map[p]])btns[map[p]].classList.add('active');
+  if(p==='home')window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ===== CANVAS PARTICLES =====
+function initCanvas(){
+  const c=document.getElementById('bg-canvas');
+  const ctx=c.getContext('2d');
+  c.width=window.innerWidth;c.height=window.innerHeight;
+  window.onresize=()=>{c.width=window.innerWidth;c.height=window.innerHeight};
+  const particles=[];
+  for(let i=0;i<60;i++){
+    particles.push({
+      x:Math.random()*c.width,y:Math.random()*c.height,
+      r:Math.random()*1.5+.5,
+      vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,
+      hue:Math.random()*60+300,opacity:Math.random()*.6+.1
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;
+      if(p.y<0)p.y=c.height;if(p.y>c.height)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`hsla(${p.hue},100%,70%,${p.opacity})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ===== WEIRDNESS HELPERS =====
+function weirdLabel(w){
+  if(w>=90)return{label:'Internet Black Hole',emoji:'🌌',color:'#a855f7'};
+  if(w>=70)return{label:'Chaotic',emoji:'👽',color:'#06d6ff'};
+  if(w>=45)return{label:'Weird',emoji:'🤪',color:'#ff2d78'};
+  return{label:'Mild',emoji:'😐',color:'#6b7280'};
+}
+
+// ===== RENDER TAGLINE =====
+function renderTagline(){
+  document.getElementById('hero-tagline').innerHTML=`<em>"${TAGLINES[Math.floor(Math.random()*TAGLINES.length)]}"</em>`;
+}
+
+function renderFact(){
+  document.getElementById('fact-text').textContent=FACTS[Math.floor(Math.random()*FACTS.length)];
+}
+
+// ===== MARQUEE =====
+function renderMarquee(){
+  const el=document.getElementById('marquee-inner');
+  const items=[...SITES,...SITES].map(s=>`<span class="marquee-item"><span class="marquee-dot"></span>${s.emoji} ${s.name}</span>`).join('');
+  el.innerHTML=items+items;
+}
+
+// ===== FEATURED (daily by date) =====
+function renderFeatured(){
+  const today=new Date();
+  const idx=(today.getFullYear()*366+today.getMonth()*31+today.getDate())%SITES.length;
+  const s=SITES[idx];
+  document.getElementById('feat-emoji').textContent=s.emoji;
+  document.getElementById('feat-name').textContent=s.name;
+  document.getElementById('feat-desc').textContent=s.desc;
+  document.getElementById('featured-card').dataset.url=s.url;
+  document.getElementById('featured-card').dataset.id=s.id;
+}
+function openFeatured(){
+  const card=document.getElementById('featured-card');
+  visitSite(SITES.find(s=>s.id==card.dataset.id));
+}
+
+// ===== CARD RENDERING =====
+function makeCard(s,onclick_fn){
+  const wl=weirdLabel(s.w);
+  const visited=state.discoveries.includes(s.id);
+  return `<div class="site-card" onclick="${onclick_fn}(${s.id})" title="${s.name}">
+    <div class="card-top">
+      <div class="card-emoji">${s.emoji}</div>
+      <div class="card-badges">
+        ${s.legendary?`<span class="badge badge-legendary">⚡ Legendary</span>`:''}
+        <span class="badge badge-cat">${s.cat}</span>
+        ${visited?`<span class="badge" style="color:var(--green);background:rgba(57,255,20,.06)">✓ Visited</span>`:''}
+      </div>
+    </div>
+    <div class="card-name">${s.name}</div>
+    <div class="card-desc">${s.desc}</div>
+    <div class="card-footer">
+      <div class="weirdness-wrap">
+        <div class="weirdness-label">
+          <span>${wl.emoji} ${wl.label}</span>
+          <span style="color:${wl.color}">${s.w}/100</span>
+        </div>
+        <div class="weirdness-bar-bg"><div class="weirdness-bar-fill" style="width:${s.w}%"></div></div>
+      </div>
+      <button class="card-go" onclick="event.stopPropagation();visitSiteById(${s.id})">Visit →</button>
+    </div>
+  </div>`;
+}
+
+function renderTrending(){
+  const sorted=[...SITES].sort((a,b)=>b.fun-a.fun).slice(0,6);
+  document.getElementById('trending-grid').innerHTML=sorted.map(s=>makeCard(s,'visitSiteById')).join('');
+}
+
+function renderRecent(){
+  const recent=[...SITES].slice(-6).reverse();
+  document.getElementById('recent-grid').innerHTML=recent.map(s=>makeCard(s,'visitSiteById')).join('');
+}
+
+// ===== EXPLORE =====
+let activeFilter='all';
+function renderExplore(filter){
+  let sites=[...SITES];
+  const q=document.getElementById('search-input')?.value.toLowerCase()||'';
+  const sort=document.getElementById('sort-select')?.value||'weirdness';
+  if(q)sites=sites.filter(s=>s.name.toLowerCase().includes(q)||s.desc.toLowerCase().includes(q)||s.cat.toLowerCase().includes(q));
+  if(state.active_cat)sites=sites.filter(s=>s.cat===state.active_cat);
+  if(sort==='weirdness')sites.sort((a,b)=>b.w-a.w);
+  else if(sort==='fun')sites.sort((a,b)=>b.fun-a.fun);
+  else sites.sort((a,b)=>a.name.localeCompare(b.name));
+  const el=document.getElementById('explore-grid');
+  if(!el)return;
+  el.innerHTML=sites.length?sites.map(s=>makeCard(s,'visitSiteById')).join(''):`<div style="padding:3rem;text-align:center;color:var(--muted);grid-column:1/-1;font-family:'Space Mono',monospace;font-size:.8rem">No sites found for that search 🌌</div>`;
+}
+
+function filterSites(){renderExplore()}
+
+function renderCats(){
+  const cats=[...new Set(SITES.map(s=>s.cat))].sort();
+  const el=document.getElementById('cats-grid');
+  if(!el)return;
+  el.innerHTML=`<button class="cat-btn active" onclick="setCat(null,this)">All (${SITES.length})</button>`+
+    cats.map(c=>`<button class="cat-btn" onclick="setCat('${c}',this)">${c} (${SITES.filter(s=>s.cat===c).length})</button>`).join('');
+}
+
+function setCat(cat,btn){
+  state.active_cat=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderExplore();
+}
+
+// ===== VISIT SITE =====
+function visitSiteById(id){visitSite(SITES.find(s=>s.id===id))}
+
+function visitSite(s){
+  if(!s)return;
+  showTeleport(s,()=>window.open(s.url,'_blank'));
+}
+
+function setMode(m){
+  state.mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('mode-'+m)?.classList.add('active');
+}
+
+function launchRandom(){
+  let pool=SITES;
+  if(state.mode==='chaos')pool=SITES.filter(s=>s.w>=80);
+  else if(state.mode==='legendary')pool=SITES.filter(s=>s.legendary);
+  else if(state.mode==='category'&&state.active_cat)pool=SITES.filter(s=>s.cat===state.active_cat);
+  const s=pool[Math.floor(Math.random()*pool.length)];
+  visitSite(s);
+}
+
+// ===== TELEPORT =====
+function showTeleport(s,callback){
+  const overlay=document.getElementById('teleport');
+  const loading=document.getElementById('t-loading');
+  const result=document.getElementById('t-result');
+  overlay.classList.add('show');
+  loading.style.display='flex';loading.style.flexDirection='column';loading.style.alignItems='center';loading.style.gap='1rem';
+  result.classList.remove('show');
+
+  const subs=['Calculating maximum weirdness...','Locating the void...','Routing through chaos...','Bypassing productivity filters...','Almost there... maybe...'];
+  let si=0;
+  const subEl=document.getElementById('t-sub');
+  const subInt=setInterval(()=>{si=(si+1)%subs.length;subEl.textContent=subs[si]},400);
+
+  // Random glitch text
+  const glyphs='アイウエオカキクケコ0123456789ABCDEF░▒▓█▄▀';
+  const glyphEl=document.getElementById('t-glyphs');
+  const glyphInt=setInterval(()=>{
+    glyphEl.textContent=Array.from({length:32},()=>glyphs[Math.floor(Math.random()*glyphs.length)]).join(' ');
+  },80);
+
+  // Reset bar
+  const bar=document.getElementById('t-bar');
+  bar.style.animation='none';bar.offsetHeight;bar.style.animation='t-fill 1.8s ease forwards';
+
+  setTimeout(()=>{
+    clearInterval(subInt);clearInterval(glyphInt);
+    loading.style.display='none';
+    document.getElementById('t-emoji').textContent=s.emoji;
+    document.getElementById('t-name').textContent=s.name;
+    document.getElementById('t-desc').textContent=s.desc;
+    const wl=weirdLabel(s.w);
+    document.getElementById('t-weird-badge').innerHTML=`<span class="weird-tag" style="color:${wl.color};border-color:${wl.color}">${wl.emoji} ${wl.label} · ${s.w}/100</span>`;
+    result.classList.add('show');
+
+    document.getElementById('t-open').onclick=()=>{
+      overlay.classList.remove('show');
+      recordVisit(s);
+      window.open(s.url,'_blank');
+    };
+    document.getElementById('t-skip').onclick=()=>{
+      overlay.classList.remove('show');
+      recordVisit(s);
+      launchRandom();
+    };
+    document.getElementById('t-close').onclick=()=>{
+      overlay.classList.remove('show');
+    };
+  },2000);
+}
+
+function recordVisit(s){
+  if(!state.discoveries.includes(s.id)){
+    state.discoveries.push(s.id);
+    state.session_discoveries++;
+    save();
+    checkAchievements(s);
+    updateCounters();
+  }
+  // Update explore grid
+  renderExplore();
+}
+
+function updateCounters(){
+  const d=state.discoveries.length;
+  document.getElementById('cnt-discoveries').textContent=d;
+  document.getElementById('nav-discoveries').textContent=d;
+  document.getElementById('stat-disc').textContent=d;
+  document.getElementById('nav-streak').textContent=state.session_discoveries;
+}
+
+// ===== ACHIEVEMENTS =====
+function checkAchievements(s){
+  const d=state.discoveries.length;
+  const unlocked=JSON.parse(localStorage.getItem('uu_achievements')||'[]');
+  const newUnlocks=[];
+
+  ACHIEVEMENTS.forEach(a=>{
+    if(unlocked.includes(a.id))return;
+    let done=false;
+    if(a.type==='discover'&&d>=a.req)done=true;
+    if(a.type==='chaos'&&s.w>=90)done=true;
+    if(a.type==='classic'&&s.cat==='Internet Classics')done=true;
+    if(a.type==='legendary'&&s.legendary){
+      const lDisc=SITES.filter(x=>x.legendary&&state.discoveries.includes(x.id)).length;
+      if(lDisc>=a.req)done=true;
+    }
+    if(a.type==='session'&&state.session_discoveries>=a.req)done=true;
+    if(a.type.startsWith('cat_')){
+      const cat=a.type.slice(4);
+      const catDisc=SITES.filter(x=>x.cat===cat&&state.discoveries.includes(x.id)).length;
+      if(catDisc>=a.req)done=true;
+    }
+    if(done){newUnlocks.push(a);unlocked.push(a.id)}
+  });
+
+  if(newUnlocks.length){
+    localStorage.setItem('uu_achievements',JSON.stringify(unlocked));
+    newUnlocks.forEach(a=>setTimeout(()=>showAchievementToast(a),500));
+    renderAchievements();
+  }
+}
+
+function showAchievementToast(a){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className='toast achievement';
+  t.innerHTML=`<div class="toast-icon">${a.icon}</div><div class="toast-text"><div class="toast-title">🏆 Achievement Unlocked!</div><div class="toast-sub">${a.name} — ${a.desc}</div></div>`;
+  tc.appendChild(t);
+  setTimeout(()=>t.remove(),5000);
+}
+
+function renderAchievements(){
+  const unlocked=JSON.parse(localStorage.getItem('uu_achievements')||'[]');
+  const el=document.getElementById('ach-grid');
+  if(!el)return;
+  el.innerHTML=ACHIEVEMENTS.map(a=>{
+    const done=unlocked.includes(a.id);
+    return `<div class="achievement ${done?'unlocked':''}">
+      <div class="achievement-icon">${a.icon}</div>
+      <div class="achievement-info">
+        <div class="achievement-name">${a.name}</div>
+        <div class="achievement-desc">${a.desc}</div>
+        <div class="achievement-lock">${done?'✓ Unlocked':'🔒 Locked'}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('ach-count').textContent=`${unlocked.length}/${ACHIEVEMENTS.length} unlocked`;
+}
+
+// ===== RABBIT HOLE =====
+function startRabbitHole(){
+  state.rabbit_chain=[];
+  const s=SITES[Math.floor(Math.random()*SITES.length)];
+  state.rabbit_chain.push(s);
+  renderRabbitHole();
+  document.getElementById('rh-extend-btn').style.display='inline-flex';
+}
+
+function extendRabbitHole(){
+  const last=state.rabbit_chain[state.rabbit_chain.length-1];
+  // Get weirder site from same or related category, higher weirdness
+  let pool=SITES.filter(s=>!state.rabbit_chain.find(r=>r.id===s.id));
+  // Prefer higher weirdness
+  pool.sort((a,b)=>b.w-a.w);
+  const pick=pool[Math.floor(Math.random()*Math.min(10,pool.length))];
+  if(pick){
+    state.rabbit_chain.push(pick);
+    renderRabbitHole();
+    if(state.rabbit_chain.length>=5){
+      checkRabbitAchievement();
+    }
+  }
+}
+
+function checkRabbitAchievement(){
+  const unlocked=JSON.parse(localStorage.getItem('uu_achievements')||'[]');
+  if(!unlocked.includes('rabbit')){
+    unlocked.push('rabbit');
+    localStorage.setItem('uu_achievements',JSON.stringify(unlocked));
+    showAchievementToast(ACHIEVEMENTS.find(a=>a.id==='rabbit'));
+    renderAchievements();
+  }
+}
+
+function renderRabbitHole(){
+  const track=document.getElementById('rh-track');
+  track.innerHTML=state.rabbit_chain.map((s,i)=>
+    `${i>0?`<div class="rh-arrow">→</div>`:''}
+    <div class="rh-card ${i===state.rabbit_chain.length-1?'active':''}" onclick="visitSiteById(${s.id})">
+      <div class="rh-depth">DEPTH ${i+1}</div>
+      <span class="rh-emoji">${s.emoji}</span>
+      <div class="rh-name">${s.name}</div>
+      <div class="rh-desc">${s.desc.substring(0,60)}...</div>
+    </div>`
+  ).join('');
+  track.scrollLeft=track.scrollWidth;
+}
+
+// ===== SPIN WHEEL =====
+function initSpinWheel(){
+  const canvas=document.getElementById('spin-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  drawWheel(ctx,0);
+}
+
+function drawWheel(ctx,rotation){
+  const cats=[...new Set(SITES.map(s=>s.cat))];
+  const n=cats.length;
+  const cx=160,cy=160,r=155;
+  const colors=['#ff2d78','#a855f7','#06d6ff','#ffd60a','#39ff14','#ff6b35','#06b6d4','#ec4899','#8b5cf6','#10b981','#f59e0b','#3b82f6','#ef4444'];
+  ctx.clearRect(0,0,320,320);
+  for(let i=0;i<n;i++){
+    const start=rotation+i*(Math.PI*2/n);
+    const end=rotation+(i+1)*(Math.PI*2/n);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,start,end);
+    ctx.fillStyle=colors[i%colors.length]+'33';
+    ctx.strokeStyle=colors[i%colors.length];ctx.lineWidth=2;
+    ctx.fill();ctx.stroke();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(start+(end-start)/2);
+    ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,.7)';
+    ctx.font='bold 9px Space Mono,monospace';
+    ctx.fillText(cats[i].substring(0,12),r-8,3);
+    ctx.restore();
+  }
+  // Pointer
+  ctx.beginPath();ctx.moveTo(cx,cy-r-5);ctx.lineTo(cx-8,cy-r+15);ctx.lineTo(cx+8,cy-r+15);
+  ctx.fillStyle='#ff2d78';ctx.fill();
+}
+
+function spinWheel(){
+  if(state.spinning)return;
+  state.spinning=true;
+  const btn=document.getElementById('spin-btn');
+  btn.disabled=true;
+  const canvas=document.getElementById('spin-canvas');
+  const ctx=canvas.getContext('2d');
+  const totalAngle=Math.PI*2*8+Math.random()*Math.PI*2;
+  const duration=4000;
+  const start=performance.now();
+  const startAngle=state.spin_angle;
+
+  function animate(now){
+    const elapsed=now-start;
+    const progress=Math.min(elapsed/duration,1);
+    const ease=1-Math.pow(1-progress,4);
+    state.spin_angle=startAngle+totalAngle*ease;
+    drawWheel(ctx,state.spin_angle);
+    if(progress<1){requestAnimationFrame(animate)}
+    else{
+      state.spinning=false;btn.disabled=false;
+      const cats=[...new Set(SITES.map(s=>s.cat))];
+      const n=cats.length;
+      const normalAngle=((state.spin_angle%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+      const winIdx=Math.floor(((Math.PI*2-normalAngle)%(Math.PI*2))/(Math.PI*2/n))%n;
+      const winCat=cats[winIdx];
+      const pool=SITES.filter(s=>s.cat===winCat);
+      const winner=pool[Math.floor(Math.random()*pool.length)];
+      showSpinResult(winner);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function showSpinResult(s){
+  const res=document.getElementById('spin-result');
+  document.getElementById('spin-emoji').textContent=s.emoji;
+  document.getElementById('spin-name').textContent=s.name;
+  document.getElementById('spin-desc').textContent=s.desc;
+  document.getElementById('spin-go').onclick=()=>visitSite(s);
+  res.style.display='block';
+  showToast('🎰','Wheel Result',`You got: ${s.name}!`);
+}
+
+function showToast(icon,title,sub){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML=`<div class="toast-icon">${icon}</div><div class="toast-text"><div class="toast-title">${title}</div><div class="toast-sub">${sub}</div></div>`;
+  tc.appendChild(t);
+  setTimeout(()=>t.remove(),4000);
+}
+</script>
+</body>
+</html>
